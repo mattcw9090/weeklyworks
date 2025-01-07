@@ -10,7 +10,7 @@ struct ContentView: View {
                 }
 
             // Tab for Students
-            StudentsView()
+            ScheduleView()
                 .tabItem {
                     Label("Students", systemImage: "person.3")
                 }
