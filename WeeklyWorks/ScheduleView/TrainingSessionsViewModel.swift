@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-class ScheduleViewModel: ObservableObject {
+class TrainingSessionsViewModel: ObservableObject {
     @Published var trainingSessions: [TrainingSession] = []
 
     func fetchTrainingSessions(from modelContext: ModelContext) {

@@ -1,9 +1,9 @@
 import SwiftUI
 import SwiftData
 
-struct ScheduleView: View {
+struct TrainingSessionsView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var scheduleViewModel = ScheduleViewModel()
+    @StateObject private var scheduleViewModel = TrainingSessionsViewModel()
     @StateObject private var studentsViewModel = StudentViewModel()
     
     var body: some View {
@@ -81,7 +81,7 @@ struct ScheduleRowView: View {
         let trainingSession = TrainingSession(student: alice, courtLocation: "PBA", courtNumber: 13, time: "12:00")
         context.insert(trainingSession)
 
-        return ScheduleView()
+        return TrainingSessionsView()
             .modelContainer(mockContainer)
     } catch {
         fatalError("Could not create ModelContainer: \(error)")
