@@ -1,25 +1,9 @@
 import SwiftUI
-
-struct TrainingSession: Identifiable {
-    let id = UUID()
-    let studentName: String
-    let courtLocation: String
-    let courtNumber: Int
-    let time: String
-    let isMessaged: Bool
-    let isBooked: Bool
-}
+import SwiftData
 
 struct ScheduleView: View {
-    // Static list of training sessions
-    let sessions = [
-        TrainingSession(studentName: "John Doe", courtLocation: "Central Park Courts", courtNumber: 1, time: "10:00 AM", isMessaged: true, isBooked: false),
-        TrainingSession(studentName: "Jane Smith", courtLocation: "Downtown Courts", courtNumber: 2, time: "11:00 AM", isMessaged: true, isBooked: true),
-        TrainingSession(studentName: "Emily Johnson", courtLocation: "Riverside Courts", courtNumber: 3, time: "1:00 PM", isMessaged: false, isBooked: false),
-        TrainingSession(studentName: "Michael Brown", courtLocation: "Uptown Courts", courtNumber: 4, time: "3:00 PM", isMessaged: true, isBooked: false),
-        TrainingSession(studentName: "Sarah Davis", courtLocation: "Westside Courts", courtNumber: 5, time: "4:30 PM", isMessaged: true, isBooked: true)
-    ]
-
+    @Query var sessions: [TrainingSession]
+    
     var body: some View {
         NavigationView {
             List(sessions) { session in
@@ -35,7 +19,7 @@ struct ScheduleRowView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(session.studentName)
+            Text(session.student.name)
                 .font(.headline)
             Text("\(session.courtLocation), Court \(session.courtNumber)")
                 .font(.subheadline)
@@ -61,5 +45,22 @@ struct ScheduleRowView: View {
 }
 
 #Preview {
-    ScheduleView()
+    let schema = Schema([Student.self, TrainingSession.self])
+    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+
+    do {
+        let mockContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+
+        // Insert Mock Data
+        let context = mockContainer.mainContext
+        let alice = Student(name: "Alice", isMale: true)
+        context.insert(alice)
+        let trainingSession = TrainingSession(student: alice, courtLocation: "PBA", courtNumber: 13, time: "12:00")
+        context.insert(trainingSession)
+
+        return ScheduleView()
+            .modelContainer(mockContainer)
+    } catch {
+        fatalError("Could not create ModelContainer: \(error)")
+    }
 }
