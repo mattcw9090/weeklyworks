@@ -2,14 +2,37 @@ import SwiftUI
 import SwiftData
 
 struct ScheduleView: View {
-    @Query var sessions: [TrainingSession]
+    @Environment(\.modelContext) private var modelContext
+    @StateObject private var scheduleViewModel = ScheduleViewModel()
+    @StateObject private var studentsViewModel = StudentViewModel()
     
     var body: some View {
         NavigationView {
-            List(sessions) { session in
-                ScheduleRowView(session: session)
+            List {
+                ForEach(scheduleViewModel.trainingSessions) { session in
+                    ScheduleRowView(session: session)
+                }
+                .onDelete { indexSet in
+                    for index in indexSet {
+                        let session = scheduleViewModel.trainingSessions[index]
+                        scheduleViewModel.deleteTrainingSession(session, from: modelContext)
+                    }
+                }
             }
             .navigationTitle("Student Trainings")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Add") {
+                        studentsViewModel.addStudent(name: "New Student", isMale: Bool.random(), to: modelContext)
+                        if let newStudent = studentsViewModel.fetchStudent(byName: "New Student", from: modelContext) {
+                            scheduleViewModel.addTrainingSession(student: newStudent, courtLocation: "PBA", courtNumber: 13, time: "14:00", to: modelContext)
+                        }
+                    }
+                }
+            }
+            .onAppear {
+                scheduleViewModel.fetchTrainingSessions(from: modelContext)
+            }
         }
     }
 }

@@ -25,7 +25,18 @@ class StudentViewModel: ObservableObject {
         saveChanges(in: modelContext)
         fetchStudents(from: modelContext)
     }
-
+    
+    func fetchStudent(byName name: String, from modelContext: ModelContext) -> Student? {
+        let fetchDescriptor = FetchDescriptor<Student>(predicate: #Predicate { $0.name == name })
+        do {
+            let fetchedStudents = try modelContext.fetch(fetchDescriptor)
+            return fetchedStudents.first
+        } catch {
+            print("Error fetching student by name: \(error)")
+            return nil
+        }
+    }
+    
     private func saveChanges(in modelContext: ModelContext) {
         do {
             try modelContext.save()
@@ -33,4 +44,5 @@ class StudentViewModel: ObservableObject {
             print("Error saving changes: \(error)")
         }
     }
+
 }
