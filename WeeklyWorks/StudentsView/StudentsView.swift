@@ -4,12 +4,20 @@ import SwiftData
 struct StudentsView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = StudentViewModel()
+    
+    @State private var showAddEditSheet = false
+    @State private var studentToEdit: Student?
 
     var body: some View {
         NavigationView {
             List {
                 ForEach(viewModel.students) { student in
                     StudentRowView(student: student)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            studentToEdit = student
+                            showAddEditSheet = true
+                        }
                 }
                 .onDelete { indexSet in
                     indexSet.map { viewModel.students[$0] }.forEach { student in
@@ -21,17 +29,25 @@ struct StudentsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add") {
-                        viewModel.addStudent(name: "New Student", isMale: Bool.random(), to: modelContext)
+                        studentToEdit = nil
+                        showAddEditSheet = true
                     }
                 }
             }
             .onAppear {
                 viewModel.fetchStudents(from: modelContext)
             }
+            .sheet(isPresented: $showAddEditSheet) {
+                AddEditStudentView(
+                    studentViewModel: viewModel,
+                    existingStudent: studentToEdit
+                ) {
+                    showAddEditSheet = false
+                }
+            }
         }
     }
 }
-
 
 struct StudentRowView: View {
     let student: Student

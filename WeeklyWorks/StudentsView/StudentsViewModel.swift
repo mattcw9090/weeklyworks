@@ -26,6 +26,11 @@ class StudentViewModel: ObservableObject {
         fetchStudents(from: modelContext)
     }
     
+    func updateStudent(_ student: Student, in modelContext: ModelContext) {
+        saveChanges(in: modelContext)
+        fetchStudents(from: modelContext)
+    }
+    
     func fetchStudent(byName name: String, from modelContext: ModelContext) -> Student? {
         let fetchDescriptor = FetchDescriptor<Student>(predicate: #Predicate { $0.name == name })
         do {
@@ -37,6 +42,24 @@ class StudentViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Single entry point for creation or update
+    func saveOrUpdateStudent(
+        existingStudent: Student?,
+        name: String,
+        isMale: Bool,
+        in modelContext: ModelContext
+    ) {
+        if let editingStudent = existingStudent {
+            // Update
+            editingStudent.name = name
+            editingStudent.isMale = isMale
+            updateStudent(editingStudent, in: modelContext)
+        } else {
+            // Create
+            addStudent(name: name, isMale: isMale, to: modelContext)
+        }
+    }
+    
     private func saveChanges(in modelContext: ModelContext) {
         do {
             try modelContext.save()
@@ -44,5 +67,4 @@ class StudentViewModel: ObservableObject {
             print("Error saving changes: \(error)")
         }
     }
-
 }

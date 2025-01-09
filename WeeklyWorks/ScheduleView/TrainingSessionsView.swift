@@ -6,11 +6,19 @@ struct TrainingSessionsView: View {
     @StateObject private var scheduleViewModel = TrainingSessionsViewModel()
     @StateObject private var studentsViewModel = StudentViewModel()
     
+    @State private var showAddEditSheet = false
+    @State private var sessionToEdit: TrainingSession?
+
     var body: some View {
         NavigationView {
             List {
                 ForEach(scheduleViewModel.trainingSessions) { session in
                     ScheduleRowView(session: session)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            sessionToEdit = session
+                            showAddEditSheet = true
+                        }
                 }
                 .onDelete { indexSet in
                     for index in indexSet {
@@ -23,19 +31,29 @@ struct TrainingSessionsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add") {
-                        studentsViewModel.addStudent(name: "New Student", isMale: Bool.random(), to: modelContext)
-                        if let newStudent = studentsViewModel.fetchStudent(byName: "New Student", from: modelContext) {
-                            scheduleViewModel.addTrainingSession(student: newStudent, courtLocation: "PBA", courtNumber: 13, time: "14:00", to: modelContext)
-                        }
+                        sessionToEdit = nil
+                        showAddEditSheet = true
                     }
                 }
             }
             .onAppear {
                 scheduleViewModel.fetchTrainingSessions(from: modelContext)
+                studentsViewModel.fetchStudents(from: modelContext)
+            }
+            // Present the sheet for both adding and editing
+            .sheet(isPresented: $showAddEditSheet) {
+                AddEditTrainingSessionView(
+                    scheduleViewModel: scheduleViewModel,
+                    students: studentsViewModel.students,
+                    existingSession: sessionToEdit
+                ) {
+                    showAddEditSheet = false
+                }
             }
         }
     }
 }
+
 
 struct ScheduleRowView: View {
     let session: TrainingSession
