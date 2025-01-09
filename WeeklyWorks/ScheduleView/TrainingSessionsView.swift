@@ -16,6 +16,7 @@ struct TrainingSessionsView: View {
                     ScheduleRowView(session: session)
                         .contentShape(Rectangle())
                         .onTapGesture {
+                            print(sessionToEdit)
                             sessionToEdit = session
                             showAddEditSheet = true
                         }
