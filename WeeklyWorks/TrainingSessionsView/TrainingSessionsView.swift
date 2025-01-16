@@ -19,14 +19,25 @@ struct TrainingSessionsView: View {
                             sessionToEdit = session
                             showAddEditSheet = true
                         }
-                }
-                .onDelete { indexSet in
-                    for index in indexSet {
-                        let session = scheduleViewModel.trainingSessions[index]
-                        scheduleViewModel.deleteTrainingSession(session, from: modelContext)
-                    }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button {
+                                // Implement Messaging here
+                                print("Nothing")
+                            } label: {
+                                Label("Message", systemImage: "envelope")
+                            }
+                            .tint(.blue)
+
+                            Button(role: .destructive) {
+                                scheduleViewModel.deleteTrainingSession(session, from: modelContext)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                 }
             }
+
+            
             .navigationTitle("Student Trainings")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
