@@ -5,7 +5,7 @@ import Foundation
 class TrainingSession {
     @Attribute(.unique) var id: UUID
     @Relationship(deleteRule: .cascade, inverse: \Student.trainingSessions)
-    var student: Student
+    var student: Student?
 
     var courtLocation: String
     var courtNumber: Int

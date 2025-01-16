@@ -85,15 +85,19 @@ class TrainingSessionViewModel: ObservableObject {
     }
     
     func messageStudent(for session: TrainingSession) {
-        let studentContactMode = session.student.contactMode
-        let studentContact = session.student.contact
-        let studentName = session.student.name
+        guard let student = session.student else {
+            print("Error: Training session has no associated student.")
+            return
+        }
+
+        let studentContactMode = student.contactMode
+        let studentContact = student.contact
+        let studentName = student.name
         let timeSlot = "\(session.startTime) - \(session.endTime)"
         let venue = "\(session.courtLocation), Court \(session.courtNumber)"
         
+        // Just for debugging
         let message = """
-        To \(studentContact) via \(studentContactMode)
-        
         Hi \(studentName),
         
         Are you okay with training at \(venue) during \(timeSlot)?

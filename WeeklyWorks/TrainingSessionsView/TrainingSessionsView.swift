@@ -69,7 +69,7 @@ struct TrainingRowView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(session.student.name)
+            Text(session.student?.name ?? "Unknown Student")
                 .font(.headline)
             Text("\(session.courtLocation), Court \(session.courtNumber)")
                 .font(.subheadline)
