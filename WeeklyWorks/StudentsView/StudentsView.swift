@@ -4,8 +4,8 @@ import SwiftData
 struct StudentsView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel = StudentViewModel()
-    
-    @State private var showAddEditSheet = false
+
+    @State private var showAddSheet = false
     @State private var studentToEdit: Student?
 
     var body: some View {
@@ -16,7 +16,6 @@ struct StudentsView: View {
                         .contentShape(Rectangle())
                         .onTapGesture {
                             studentToEdit = student
-                            showAddEditSheet = true
                         }
                 }
                 .onDelete { indexSet in
@@ -29,20 +28,31 @@ struct StudentsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add") {
-                        studentToEdit = nil
-                        showAddEditSheet = true
+                        showAddSheet = true
                     }
                 }
             }
             .onAppear {
                 viewModel.fetchStudents(from: modelContext)
             }
-            .sheet(isPresented: $showAddEditSheet) {
+
+            // MARK: - Edit Student Sheet
+            .sheet(item: $studentToEdit) { student in
                 AddEditStudentView(
                     studentViewModel: viewModel,
-                    existingStudent: studentToEdit
+                    existingStudent: student
                 ) {
-                    showAddEditSheet = false
+                    studentToEdit = nil
+                }
+            }
+
+            // MARK: - Add Student Sheet
+            .sheet(isPresented: $showAddSheet) {
+                AddEditStudentView(
+                    studentViewModel: viewModel,
+                    existingStudent: nil
+                ) {
+                    showAddSheet = false
                 }
             }
         }
@@ -59,7 +69,9 @@ struct StudentRowView: View {
             VStack(alignment: .leading) {
                 Text(student.name)
                     .font(.headline)
-                Text(student.contactMode == .whatsapp ? "WhatsApp: \(student.contact)" : "Instagram: \(student.contact)")
+                Text(student.contactMode == .whatsapp
+                     ? "WhatsApp: \(student.contact)"
+                     : "Instagram: \(student.contact)")
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }

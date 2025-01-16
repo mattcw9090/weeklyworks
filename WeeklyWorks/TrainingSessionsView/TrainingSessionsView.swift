@@ -6,9 +6,9 @@ struct TrainingSessionsView: View {
     @StateObject private var trainingSessionViewModel = TrainingSessionViewModel()
     @StateObject private var studentViewModel = StudentViewModel()
     
-    @State private var showAddEditSheet = false
+    @State private var showAddSheet = false
     @State private var sessionToEdit: TrainingSession?
-
+    
     var body: some View {
         NavigationView {
             List {
@@ -17,7 +17,6 @@ struct TrainingSessionsView: View {
                         .contentShape(Rectangle())
                         .onTapGesture {
                             sessionToEdit = session
-                            showAddEditSheet = true
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button {
@@ -34,14 +33,11 @@ struct TrainingSessionsView: View {
                         }
                 }
             }
-
-            
             .navigationTitle("Student Trainings")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add") {
-                        sessionToEdit = nil
-                        showAddEditSheet = true
+                        showAddSheet = true
                     }
                 }
             }
@@ -49,20 +45,28 @@ struct TrainingSessionsView: View {
                 trainingSessionViewModel.fetchTrainingSessions(from: modelContext)
                 studentViewModel.fetchStudents(from: modelContext)
             }
-            // Present the sheet for both adding and editing
-            .sheet(isPresented: $showAddEditSheet) {
+            .sheet(item: $sessionToEdit) { session in
                 AddEditTrainingSessionView(
                     scheduleViewModel: trainingSessionViewModel,
                     students: studentViewModel.students,
-                    existingSession: sessionToEdit
+                    existingSession: session
                 ) {
-                    showAddEditSheet = false
+                    // Dismiss callback
+                    sessionToEdit = nil
+                }
+            }
+            .sheet(isPresented: $showAddSheet) {
+                AddEditTrainingSessionView(
+                    scheduleViewModel: trainingSessionViewModel,
+                    students: studentViewModel.students,
+                    existingSession: nil
+                ) {
+                    showAddSheet = false
                 }
             }
         }
     }
 }
-
 
 struct TrainingRowView: View {
     let session: TrainingSession
@@ -120,4 +124,3 @@ struct TrainingRowView: View {
         fatalError("Could not create ModelContainer: \(error)")
     }
 }
-

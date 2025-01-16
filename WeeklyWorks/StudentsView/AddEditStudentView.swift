@@ -4,19 +4,15 @@ import SwiftData
 struct AddEditStudentView: View {
     @Environment(\.modelContext) private var modelContext
     
-    /// The view model in charge of students
     @ObservedObject var studentViewModel: StudentViewModel
     
-    /// If non-nil, we are editing an existing student
     let existingStudent: Student?
     
-    // Form fields
     @State private var name: String = ""
     @State private var isMale: Bool = true
     @State private var contactMode: ContactMode = .whatsapp
     @State private var contact: String = ""
     
-    // Callback to dismiss the view
     var onDismiss: (() -> Void)?
     
     var body: some View {
@@ -35,7 +31,10 @@ struct AddEditStudentView: View {
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     
-                    TextField(contactMode == .whatsapp ? "WhatsApp Number" : "Instagram Handle", text: $contact)
+                    TextField(contactMode == .whatsapp
+                              ? "WhatsApp Number"
+                              : "Instagram Handle",
+                              text: $contact)
                 }
             }
             .navigationTitle(existingStudent == nil ? "Add Student" : "Edit Student")
@@ -47,13 +46,11 @@ struct AddEditStudentView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        // Validate contact before saving
                         guard isValidContact(contactMode: contactMode, contact: contact) else {
-                            // Show an error alert or feedback
                             print("Invalid contact information.")
                             return
                         }
-                        
+
                         studentViewModel.saveOrUpdateStudent(
                             existingStudent: existingStudent,
                             name: name,

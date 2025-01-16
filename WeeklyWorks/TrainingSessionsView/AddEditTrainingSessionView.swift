@@ -54,6 +54,7 @@ struct AddEditTrainingSessionView: View {
                         guard let selectedStudent = selectedStudent else {
                             return
                         }
+                        
                         scheduleViewModel.saveOrUpdateSession(
                             existingSession: existingSession,
                             student: selectedStudent,
@@ -65,6 +66,7 @@ struct AddEditTrainingSessionView: View {
                             isBooked: isBooked,
                             in: modelContext
                         )
+                        
                         onDismiss?()
                     }) {
                         Text("Save")
