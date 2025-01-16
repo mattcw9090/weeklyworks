@@ -4,24 +4,18 @@ import SwiftData
 struct AddEditTrainingSessionView: View {
     @Environment(\.modelContext) private var modelContext
     
-    /// The view model in charge of training sessions
     @ObservedObject var scheduleViewModel: TrainingSessionsViewModel
-    
-    /// The students list so we can populate a dropdown
     let students: [Student]
-    
-    /// If non-nil, we are editing an existing session
     let existingSession: TrainingSession?
     
-    // Form fields
     @State private var selectedStudent: Student?
     @State private var courtLocation: String = ""
     @State private var courtNumber: String = ""
-    @State private var time: String = ""
+    @State private var startTime: String = ""
+    @State private var endTime: String = ""
     @State private var isMessaged: Bool = false
     @State private var isBooked: Bool = false
     
-    // Callback to dismiss the view
     var onDismiss: (() -> Void)?
     
     var body: some View {
@@ -40,7 +34,8 @@ struct AddEditTrainingSessionView: View {
                         .keyboardType(.numberPad)
                 }
                 Section("Time") {
-                    TextField("Time (e.g. 14:00)", text: $time)
+                    TextField("Start Time (e.g. 14:00)", text: $startTime)
+                    TextField("End Time (e.g. 15:30)", text: $endTime)
                 }
                 Section("Status Flags") {
                     Toggle("Is Messaged?", isOn: $isMessaged)
@@ -55,9 +50,8 @@ struct AddEditTrainingSessionView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
+                    Button(action: {
                         guard let selectedStudent = selectedStudent else {
-                            // handle no selection gracefully
                             return
                         }
                         scheduleViewModel.saveOrUpdateSession(
@@ -65,12 +59,15 @@ struct AddEditTrainingSessionView: View {
                             student: selectedStudent,
                             courtLocation: courtLocation,
                             courtNumber: courtNumber,
-                            time: time,
+                            startTime: startTime,
+                            endTime: endTime,
                             isMessaged: isMessaged,
                             isBooked: isBooked,
                             in: modelContext
                         )
                         onDismiss?()
+                    }) {
+                        Text("Save")
                     }
                 }
             }
@@ -79,7 +76,8 @@ struct AddEditTrainingSessionView: View {
                     selectedStudent = session.student
                     courtLocation = session.courtLocation
                     courtNumber = String(session.courtNumber)
-                    time = session.time
+                    startTime = session.startTime
+                    endTime = session.endTime
                     isMessaged = session.isMessaged
                     isBooked = session.isBooked
                 }

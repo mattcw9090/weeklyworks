@@ -9,7 +9,7 @@ class TrainingSessionsViewModel: ObservableObject {
         do {
             trainingSessions = try modelContext.fetch(fetchDescriptor)
         } catch {
-            print("Error fetching students: \(error)")
+            print("Error fetching training sessions: \(error)")
         }
     }
 
@@ -17,7 +17,8 @@ class TrainingSessionsViewModel: ObservableObject {
         student: Student,
         courtLocation: String,
         courtNumber: Int,
-        time: String,
+        startTime: String,
+        endTime: String,
         isMessaged: Bool = false,
         isBooked: Bool = false,
         to modelContext: ModelContext
@@ -26,7 +27,8 @@ class TrainingSessionsViewModel: ObservableObject {
             student: student,
             courtLocation: courtLocation,
             courtNumber: courtNumber,
-            time: time,
+            startTime: startTime,
+            endTime: endTime,
             isMessaged: isMessaged,
             isBooked: isBooked
         )
@@ -46,14 +48,15 @@ class TrainingSessionsViewModel: ObservableObject {
         saveChanges(in: modelContext)
         fetchTrainingSessions(from: modelContext)
     }
-    
+
     // MARK: - Single entry point for creation or update
     func saveOrUpdateSession(
         existingSession: TrainingSession?,
         student: Student,
         courtLocation: String,
         courtNumber: String,
-        time: String,
+        startTime: String,
+        endTime: String,
         isMessaged: Bool,
         isBooked: Bool,
         in modelContext: ModelContext
@@ -62,7 +65,8 @@ class TrainingSessionsViewModel: ObservableObject {
             editingSession.student = student
             editingSession.courtLocation = courtLocation
             editingSession.courtNumber = Int(courtNumber) ?? 0
-            editingSession.time = time
+            editingSession.startTime = startTime
+            editingSession.endTime = endTime
             editingSession.isMessaged = isMessaged
             editingSession.isBooked = isBooked
 
@@ -73,7 +77,8 @@ class TrainingSessionsViewModel: ObservableObject {
                 student: student,
                 courtLocation: courtLocation,
                 courtNumber: Int(courtNumber) ?? 0,
-                time: time,
+                startTime: startTime,
+                endTime: endTime,
                 isMessaged: isMessaged,
                 isBooked: isBooked,
                 to: modelContext

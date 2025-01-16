@@ -64,7 +64,7 @@ struct ScheduleRowView: View {
                 .font(.headline)
             Text("\(session.courtLocation), Court \(session.courtNumber)")
                 .font(.subheadline)
-            Text(session.time)
+            Text("\(session.startTime) - \(session.endTime)")
                 .font(.caption)
                 .foregroundColor(.gray)
             HStack {
@@ -96,7 +96,13 @@ struct ScheduleRowView: View {
         let context = mockContainer.mainContext
         let alice = Student(name: "Alice", isMale: false, contactMode: .instagram, contact: "@alice")
         context.insert(alice)
-        let trainingSession = TrainingSession(student: alice, courtLocation: "PBA", courtNumber: 13, time: "12:00")
+        let trainingSession = TrainingSession(
+            student: alice,
+            courtLocation: "PBA",
+            courtNumber: 13,
+            startTime: "12:00 PM",
+            endTime: "01:30 PM"
+        )
         context.insert(trainingSession)
 
         return TrainingSessionsView()
@@ -105,3 +111,4 @@ struct ScheduleRowView: View {
         fatalError("Could not create ModelContainer: \(error)")
     }
 }
+
