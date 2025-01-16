@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-class TrainingSessionsViewModel: ObservableObject {
+class TrainingSessionViewModel: ObservableObject {
     @Published var trainingSessions: [TrainingSession] = []
 
     func fetchTrainingSessions(from modelContext: ModelContext) {
@@ -43,13 +43,11 @@ class TrainingSessionsViewModel: ObservableObject {
         fetchTrainingSessions(from: modelContext)
     }
 
-    /// Called once we have a session object that was updated in the UI
     func updateTrainingSession(_ trainingSession: TrainingSession, in modelContext: ModelContext) {
         saveChanges(in: modelContext)
         fetchTrainingSessions(from: modelContext)
     }
 
-    // MARK: - Single entry point for creation or update
     func saveOrUpdateSession(
         existingSession: TrainingSession?,
         student: Student,
@@ -84,6 +82,24 @@ class TrainingSessionsViewModel: ObservableObject {
                 to: modelContext
             )
         }
+    }
+    
+    func constructMessage(for session: TrainingSession) -> String {
+        let studentContactMode = session.student.contactMode
+        let studentContact = session.student.contact
+        let studentName = session.student.name
+        let timeSlot = "\(session.startTime) - \(session.endTime)"
+        let venue = "\(session.courtLocation), Court \(session.courtNumber)"
+        
+        return """
+        To \(studentContact) via \(studentContactMode)
+        
+        Hi \(studentName),
+        
+        Are you okay with training at \(venue) during \(timeSlot)?
+        
+        Please let me know.
+        """
     }
 
     private func saveChanges(in modelContext: ModelContext) {

@@ -4,7 +4,7 @@ import SwiftData
 struct AddEditTrainingSessionView: View {
     @Environment(\.modelContext) private var modelContext
     
-    @ObservedObject var scheduleViewModel: TrainingSessionsViewModel
+    @ObservedObject var scheduleViewModel: TrainingSessionViewModel
     let students: [Student]
     let existingSession: TrainingSession?
     

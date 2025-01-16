@@ -3,8 +3,8 @@ import SwiftData
 
 struct TrainingSessionsView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var scheduleViewModel = TrainingSessionsViewModel()
-    @StateObject private var studentsViewModel = StudentViewModel()
+    @StateObject private var trainingSessionViewModel = TrainingSessionViewModel()
+    @StateObject private var studentViewModel = StudentViewModel()
     
     @State private var showAddEditSheet = false
     @State private var sessionToEdit: TrainingSession?
@@ -12,8 +12,8 @@ struct TrainingSessionsView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(scheduleViewModel.trainingSessions) { session in
-                    ScheduleRowView(session: session)
+                ForEach(trainingSessionViewModel.trainingSessions) { session in
+                    TrainingRowView(session: session)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             sessionToEdit = session
@@ -21,15 +21,15 @@ struct TrainingSessionsView: View {
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button {
-                                // Implement Messaging here
-                                print("Nothing")
+                                let message = trainingSessionViewModel.constructMessage(for: session)
+                                print(message)
+                                // To be implemented later
                             } label: {
                                 Label("Message", systemImage: "envelope")
                             }
-                            .tint(.blue)
 
                             Button(role: .destructive) {
-                                scheduleViewModel.deleteTrainingSession(session, from: modelContext)
+                                trainingSessionViewModel.deleteTrainingSession(session, from: modelContext)
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }
@@ -48,14 +48,14 @@ struct TrainingSessionsView: View {
                 }
             }
             .onAppear {
-                scheduleViewModel.fetchTrainingSessions(from: modelContext)
-                studentsViewModel.fetchStudents(from: modelContext)
+                trainingSessionViewModel.fetchTrainingSessions(from: modelContext)
+                studentViewModel.fetchStudents(from: modelContext)
             }
             // Present the sheet for both adding and editing
             .sheet(isPresented: $showAddEditSheet) {
                 AddEditTrainingSessionView(
-                    scheduleViewModel: scheduleViewModel,
-                    students: studentsViewModel.students,
+                    scheduleViewModel: trainingSessionViewModel,
+                    students: studentViewModel.students,
                     existingSession: sessionToEdit
                 ) {
                     showAddEditSheet = false
@@ -66,7 +66,7 @@ struct TrainingSessionsView: View {
 }
 
 
-struct ScheduleRowView: View {
+struct TrainingRowView: View {
     let session: TrainingSession
 
     var body: some View {
