@@ -56,8 +56,13 @@ struct StudentRowView: View {
         HStack {
             Image(systemName: "person.fill")
                 .foregroundColor(student.isMale ? .blue : .pink)
-            Text(student.name)
-                .font(.headline)
+            VStack(alignment: .leading) {
+                Text(student.name)
+                    .font(.headline)
+                Text(student.contactMode == .whatsapp ? "WhatsApp: \(student.contact)" : "Instagram: \(student.contact)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
             Spacer()
         }
         .padding(.vertical, 8)
@@ -73,9 +78,9 @@ struct StudentRowView: View {
 
         // Insert Mock Data
         let context = mockContainer.mainContext
-        context.insert(Student(name: "Alice", isMale: true))
-        context.insert(Student(name: "Dennis", isMale: true))
-        context.insert(Student(name: "Vinny", isMale: false))
+        context.insert(Student(name: "Alice", isMale: false, contactMode: .instagram, contact: "@alice"))
+        context.insert(Student(name: "Dennis", isMale: true, contactMode: .instagram, contact: "@dennis"))
+        context.insert(Student(name: "Vinny", isMale: false, contactMode: .whatsapp, contact: "+61420212391"))
 
         return StudentsView()
             .modelContainer(mockContainer)

@@ -94,7 +94,7 @@ struct ScheduleRowView: View {
 
         // Insert Mock Data
         let context = mockContainer.mainContext
-        let alice = Student(name: "Alice", isMale: true)
+        let alice = Student(name: "Alice", isMale: false, contactMode: .instagram, contact: "@alice")
         context.insert(alice)
         let trainingSession = TrainingSession(student: alice, courtLocation: "PBA", courtNumber: 13, time: "12:00")
         context.insert(trainingSession)

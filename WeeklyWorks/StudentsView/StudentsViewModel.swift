@@ -13,8 +13,8 @@ class StudentViewModel: ObservableObject {
         }
     }
 
-    func addStudent(name: String, isMale: Bool, to modelContext: ModelContext) {
-        let newStudent = Student(name: name, isMale: isMale)
+    func addStudent(name: String, isMale: Bool, contactMode: ContactMode, contact: String, to modelContext: ModelContext) {
+        let newStudent = Student(name: name, isMale: isMale, contactMode: contactMode, contact: contact)
         modelContext.insert(newStudent)
         saveChanges(in: modelContext)
         fetchStudents(from: modelContext)
@@ -47,16 +47,20 @@ class StudentViewModel: ObservableObject {
         existingStudent: Student?,
         name: String,
         isMale: Bool,
+        contactMode: ContactMode,
+        contact: String,
         in modelContext: ModelContext
     ) {
         if let editingStudent = existingStudent {
-            // Update
+            // Update the existing student
             editingStudent.name = name
             editingStudent.isMale = isMale
+            editingStudent.contactMode = contactMode
+            editingStudent.contact = contact
             updateStudent(editingStudent, in: modelContext)
         } else {
-            // Create
-            addStudent(name: name, isMale: isMale, to: modelContext)
+            // Create a new student
+            addStudent(name: name, isMale: isMale, contactMode: contactMode, contact: contact, to: modelContext)
         }
     }
     
