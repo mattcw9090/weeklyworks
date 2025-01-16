@@ -21,9 +21,7 @@ struct TrainingSessionsView: View {
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button {
-                                let message = trainingSessionViewModel.constructMessage(for: session)
-                                print(message)
-                                // To be implemented later
+                                trainingSessionViewModel.messageStudent(for: session)
                             } label: {
                                 Label("Message", systemImage: "envelope")
                             }

@@ -84,14 +84,14 @@ class TrainingSessionViewModel: ObservableObject {
         }
     }
     
-    func constructMessage(for session: TrainingSession) -> String {
+    func messageStudent(for session: TrainingSession) {
         let studentContactMode = session.student.contactMode
         let studentContact = session.student.contact
         let studentName = session.student.name
         let timeSlot = "\(session.startTime) - \(session.endTime)"
         let venue = "\(session.courtLocation), Court \(session.courtNumber)"
         
-        return """
+        let message = """
         To \(studentContact) via \(studentContactMode)
         
         Hi \(studentName),
@@ -100,6 +100,8 @@ class TrainingSessionViewModel: ObservableObject {
         
         Please let me know.
         """
+        
+        print(message)
     }
 
     private func saveChanges(in modelContext: ModelContext) {
