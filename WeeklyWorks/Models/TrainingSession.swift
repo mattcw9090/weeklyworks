@@ -4,9 +4,7 @@ import Foundation
 @Model
 class TrainingSession {
     @Attribute(.unique) var id: UUID
-    @Relationship(deleteRule: .cascade, inverse: \Student.trainingSessions)
     var student: Student?
-
     var courtLocation: String
     var courtNumber: Int
     var startTime: String
@@ -14,7 +12,7 @@ class TrainingSession {
     var isMessaged: Bool
     var isBooked: Bool
 
-    init(student: Student, courtLocation: String, courtNumber: Int, startTime: String, endTime: String,
+    init(student: Student?, courtLocation: String, courtNumber: Int, startTime: String, endTime: String,
          isMessaged: Bool = false, isBooked: Bool = false) {
         self.id = UUID()
         self.student = student

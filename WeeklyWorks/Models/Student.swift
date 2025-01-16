@@ -11,6 +11,7 @@ class Student {
     @Attribute(.unique) var id: UUID
     var name: String
     var isMale: Bool
+    @Relationship(deleteRule: .cascade, inverse: \TrainingSession.student)
     var trainingSessions: [TrainingSession] = []
     var contactMode: ContactMode
     var contact: String {
