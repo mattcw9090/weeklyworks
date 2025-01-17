@@ -116,8 +116,6 @@ class TrainingSessionViewModel: ObservableObject {
         case .instagram:
             openInstagram(username: student.contact)
         }
-        
-        print(messageText)
     }
     
     private func sendWhatsAppMessage(to phoneNumber: String, message: String) {
