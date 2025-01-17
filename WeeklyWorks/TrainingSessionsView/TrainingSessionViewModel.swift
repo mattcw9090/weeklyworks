@@ -108,17 +108,19 @@ class TrainingSessionViewModel: ObservableObject {
         Please let me know.
         """
         
+        UIPasteboard.general.string = messageText
+        
         switch student.contactMode {
         case .whatsapp:
             sendWhatsAppMessage(to: student.contact, message: messageText)
         case .instagram:
-            openInstagram(username: student.contact, withMessage: messageText)
+            openInstagram(username: student.contact)
         }
         
         print(messageText)
     }
     
-    func sendWhatsAppMessage(to phoneNumber: String, message: String) {
+    private func sendWhatsAppMessage(to phoneNumber: String, message: String) {
         let encodedMessage = message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "whatsapp://send?phone=\(phoneNumber)&text=\(encodedMessage)"
         
@@ -134,7 +136,7 @@ class TrainingSessionViewModel: ObservableObject {
         }
     }
     
-    func openInstagram(username: String, withMessage message: String) {
+    private func openInstagram(username: String) {
         let username = username.trimmingCharacters(in: CharacterSet(charactersIn: "@"))
         let profileURLString = "instagram://user?username=\(username)"
         
@@ -142,8 +144,6 @@ class TrainingSessionViewModel: ObservableObject {
             print("Error: Unable to construct Instagram profile URL.")
             return
         }
-        
-        UIPasteboard.general.string = message
         
         if UIApplication.shared.canOpenURL(profileURL) {
             UIApplication.shared.open(profileURL, options: [:], completionHandler: nil)
