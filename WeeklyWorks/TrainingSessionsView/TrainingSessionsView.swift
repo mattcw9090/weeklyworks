@@ -53,7 +53,6 @@ struct TrainingSessionsView: View {
                     students: studentViewModel.students,
                     existingSession: session
                 ) {
-                    // Dismiss callback
                     sessionToEdit = nil
                 }
             }
@@ -77,9 +76,9 @@ struct TrainingRowView: View {
         VStack(alignment: .leading) {
             Text(session.student?.name ?? "Unknown Student")
                 .font(.headline)
-            Text("\(session.courtLocation), Court \(session.courtNumber)")
+            Text("\(session.courtLocation.rawValue), Court \(session.courtNumber)")
                 .font(.subheadline)
-            Text("\(session.startTime) - \(session.endTime)")
+            Text("\(session.dayOfWeek.rawValue): \(session.startTime) - \(session.endTime)")
                 .font(.caption)
                 .foregroundColor(.gray)
             HStack {
@@ -113,10 +112,11 @@ struct TrainingRowView: View {
         context.insert(alice)
         let trainingSession = TrainingSession(
             student: alice,
-            courtLocation: "PBA",
+            courtLocation: .canningvale,
             courtNumber: 13,
             startTime: "12:00 PM",
-            endTime: "01:30 PM"
+            endTime: "01:30 PM",
+            dayOfWeek: .monday
         )
         context.insert(trainingSession)
 

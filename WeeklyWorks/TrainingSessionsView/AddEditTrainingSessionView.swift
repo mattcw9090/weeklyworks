@@ -9,10 +9,11 @@ struct AddEditTrainingSessionView: View {
     let existingSession: TrainingSession?
     
     @State private var selectedStudent: Student?
-    @State private var courtLocation: String = ""
+    @State private var selectedCourtLocation: CourtLocation = .canningvale
     @State private var courtNumber: String = ""
     @State private var startTime: String = ""
     @State private var endTime: String = ""
+    @State private var selectedDayOfWeek: DayOfWeek = .monday
     @State private var isMessaged: Bool = false
     @State private var isBooked: Bool = false
     
@@ -29,13 +30,24 @@ struct AddEditTrainingSessionView: View {
                     }
                 }
                 Section("Court Details") {
-                    TextField("Court Location", text: $courtLocation)
+                    Picker("Court Location", selection: $selectedCourtLocation) {
+                        ForEach(CourtLocation.allCases, id: \.self) { location in
+                            Text(location.rawValue).tag(location)
+                        }
+                    }
                     TextField("Court Number", text: $courtNumber)
                         .keyboardType(.numberPad)
                 }
                 Section("Time") {
                     TextField("Start Time (e.g. 14:00)", text: $startTime)
                     TextField("End Time (e.g. 15:30)", text: $endTime)
+                }
+                Section("Day of the Week") {
+                    Picker("Select Day", selection: $selectedDayOfWeek) {
+                        ForEach(DayOfWeek.allCases, id: \.self) { day in
+                            Text(day.rawValue).tag(day)
+                        }
+                    }
                 }
                 Section("Status Flags") {
                     Toggle("Is Messaged?", isOn: $isMessaged)
@@ -51,17 +63,19 @@ struct AddEditTrainingSessionView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        guard let selectedStudent = selectedStudent else {
+                        guard let selectedStudent = selectedStudent,
+                              let courtNumberInt = Int(courtNumber) else {
                             return
                         }
                         
                         scheduleViewModel.saveOrUpdateSession(
                             existingSession: existingSession,
                             student: selectedStudent,
-                            courtLocation: courtLocation,
-                            courtNumber: courtNumber,
+                            courtLocation: selectedCourtLocation,
+                            courtNumber: courtNumberInt,
                             startTime: startTime,
                             endTime: endTime,
+                            dayOfWeek: selectedDayOfWeek,
                             isMessaged: isMessaged,
                             isBooked: isBooked,
                             in: modelContext
@@ -76,10 +90,11 @@ struct AddEditTrainingSessionView: View {
             .onAppear {
                 if let session = existingSession {
                     selectedStudent = session.student
-                    courtLocation = session.courtLocation
+                    selectedCourtLocation = session.courtLocation
                     courtNumber = String(session.courtNumber)
                     startTime = session.startTime
                     endTime = session.endTime
+                    selectedDayOfWeek = session.dayOfWeek
                     isMessaged = session.isMessaged
                     isBooked = session.isBooked
                 }

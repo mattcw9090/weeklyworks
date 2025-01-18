@@ -20,10 +20,11 @@ class TrainingSessionViewModel: ObservableObject {
     
     func addTrainingSession(
         student: Student,
-        courtLocation: String,
+        courtLocation: CourtLocation,
         courtNumber: Int,
         startTime: String,
         endTime: String,
+        dayOfWeek: DayOfWeek,
         isMessaged: Bool = false,
         isBooked: Bool = false,
         to modelContext: ModelContext
@@ -34,6 +35,7 @@ class TrainingSessionViewModel: ObservableObject {
             courtNumber: courtNumber,
             startTime: startTime,
             endTime: endTime,
+            dayOfWeek: dayOfWeek,
             isMessaged: isMessaged,
             isBooked: isBooked
         )
@@ -56,10 +58,11 @@ class TrainingSessionViewModel: ObservableObject {
     func saveOrUpdateSession(
         existingSession: TrainingSession?,
         student: Student,
-        courtLocation: String,
-        courtNumber: String,
+        courtLocation: CourtLocation,
+        courtNumber: Int,
         startTime: String,
         endTime: String,
+        dayOfWeek: DayOfWeek,
         isMessaged: Bool,
         isBooked: Bool,
         in modelContext: ModelContext
@@ -67,9 +70,10 @@ class TrainingSessionViewModel: ObservableObject {
         if let editingSession = existingSession {
             editingSession.student = student
             editingSession.courtLocation = courtLocation
-            editingSession.courtNumber = Int(courtNumber) ?? 0
+            editingSession.courtNumber = courtNumber
             editingSession.startTime = startTime
             editingSession.endTime = endTime
+            editingSession.dayOfWeek = dayOfWeek
             editingSession.isMessaged = isMessaged
             editingSession.isBooked = isBooked
             
@@ -78,9 +82,10 @@ class TrainingSessionViewModel: ObservableObject {
             addTrainingSession(
                 student: student,
                 courtLocation: courtLocation,
-                courtNumber: Int(courtNumber) ?? 0,
+                courtNumber: courtNumber,
                 startTime: startTime,
                 endTime: endTime,
+                dayOfWeek: dayOfWeek,
                 isMessaged: isMessaged,
                 isBooked: isBooked,
                 to: modelContext
@@ -98,12 +103,13 @@ class TrainingSessionViewModel: ObservableObject {
         
         let studentName = student.name
         let timeSlot = "\(session.startTime) - \(session.endTime)"
-        let venue = "\(session.courtLocation), Court \(session.courtNumber)"
+        let venue = "\(session.courtLocation.rawValue), Court \(session.courtNumber)"
+        let day = session.dayOfWeek.rawValue
         
         let messageText = """
         Hi \(studentName),
         
-        Are you okay with training at \(venue) during \(timeSlot)?
+        Are you okay with training at \(venue) on \(day) during \(timeSlot)?
         
         Please let me know.
         """
