@@ -18,13 +18,21 @@ struct TrainingSessionsView: View {
                         .onTapGesture {
                             sessionToEdit = session
                         }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             Button {
                                 trainingSessionViewModel.messageStudent(for: session)
                             } label: {
                                 Label("Message", systemImage: "envelope")
                             }
-
+                            .tint(.blue)
+                            
+                            Button {
+                                trainingSessionViewModel.bookCourt(for: session)
+                            } label: {
+                                Label("Book Court", systemImage: "sportscourt")
+                            }
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 trainingSessionViewModel.deleteTrainingSession(session, from: modelContext)
                             } label: {

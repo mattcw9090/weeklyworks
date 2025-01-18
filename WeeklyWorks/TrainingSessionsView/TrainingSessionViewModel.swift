@@ -118,6 +118,10 @@ class TrainingSessionViewModel: ObservableObject {
         }
     }
     
+    func bookCourt(for session: TrainingSession) {
+        print("Court Booked")
+    }
+    
     private func sendWhatsAppMessage(to phoneNumber: String, message: String) {
         let encodedMessage = message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "whatsapp://send?phone=\(phoneNumber)&text=\(encodedMessage)"
