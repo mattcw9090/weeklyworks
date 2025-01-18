@@ -25,12 +25,6 @@ struct TrainingSessionsView: View {
                                 Label("Message", systemImage: "envelope")
                             }
                             .tint(.blue)
-                            
-                            Button {
-                                trainingSessionViewModel.bookCourt(for: session)
-                            } label: {
-                                Label("Book Court", systemImage: "sportscourt")
-                            }
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
