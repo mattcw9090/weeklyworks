@@ -11,6 +11,20 @@ enum DayOfWeek: String, CaseIterable {
     case sunday = "Sunday"
 }
 
+extension DayOfWeek {
+    var order: Int {
+        switch self {
+        case .monday: return 1
+        case .tuesday: return 2
+        case .wednesday: return 3
+        case .thursday: return 4
+        case .friday: return 5
+        case .saturday: return 6
+        case .sunday: return 7
+        }
+    }
+}
+
 enum CourtLocation: String, CaseIterable {
     case canningvale = "PBA Canningvale"
     case malaga = "PBA Malaga"

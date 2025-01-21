@@ -11,6 +11,14 @@ class TrainingSessionViewModel: ObservableObject {
         let fetchDescriptor = FetchDescriptor<TrainingSession>()
         do {
             trainingSessions = try modelContext.fetch(fetchDescriptor)
+            trainingSessions.sort { lhs, rhs in
+                if lhs.dayOfWeek.order == rhs.dayOfWeek.order {
+                    return lhs.startTime < rhs.startTime
+                } else {
+                    return lhs.dayOfWeek.order < rhs.dayOfWeek.order
+                }
+            }
+            
         } catch {
             print("Error fetching training sessions: \(error)")
         }
