@@ -16,17 +16,14 @@ enum CourtLocation: String, CaseIterable {
     case malaga = "PBA Malaga"
 }
 
-import SwiftData
-import Foundation
-
 @Model
 class TrainingSession {
     @Attribute(.unique) var id: UUID
     var student: Student?
     var courtLocationRaw: String
     var courtNumber: Int
-    var startTime: String
-    var endTime: String
+    var startTimeRaw: Date
+    var endTimeRaw: Date
     var dayOfWeekRaw: String
     var isMessaged: Bool
     var isBooked: Bool
@@ -49,14 +46,32 @@ class TrainingSession {
         }
     }
 
-    init(student: Student?, courtLocation: CourtLocation, courtNumber: Int, startTime: String, endTime: String,
+    var startTime: Date {
+        get {
+            startTimeRaw
+        }
+        set {
+            startTimeRaw = newValue
+        }
+    }
+
+    var endTime: Date {
+        get {
+            endTimeRaw
+        }
+        set {
+            endTimeRaw = newValue
+        }
+    }
+
+    init(student: Student?, courtLocation: CourtLocation, courtNumber: Int, startTime: Date, endTime: Date,
          dayOfWeek: DayOfWeek, isMessaged: Bool = false, isBooked: Bool = false) {
         self.id = UUID()
         self.student = student
         self.courtLocationRaw = courtLocation.rawValue
         self.courtNumber = courtNumber
-        self.startTime = startTime
-        self.endTime = endTime
+        self.startTimeRaw = startTime
+        self.endTimeRaw = endTime
         self.dayOfWeekRaw = dayOfWeek.rawValue
         self.isMessaged = isMessaged
         self.isBooked = isBooked

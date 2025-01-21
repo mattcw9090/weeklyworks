@@ -78,7 +78,7 @@ struct TrainingRowView: View {
                 .font(.headline)
             Text("\(session.courtLocation.rawValue), Court \(session.courtNumber)")
                 .font(.subheadline)
-            Text("\(session.dayOfWeek.rawValue): \(session.startTime) - \(session.endTime)")
+            Text("\(session.dayOfWeek.rawValue): \(formattedTime(session.startTime)) - \(formattedTime(session.endTime))")
                 .font(.caption)
                 .foregroundColor(.gray)
             HStack {
@@ -97,6 +97,12 @@ struct TrainingRowView: View {
         }
         .padding(.vertical, 5)
     }
+    
+    private func formattedTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: date)
+    }
 }
 
 #Preview {
@@ -114,8 +120,8 @@ struct TrainingRowView: View {
             student: alice,
             courtLocation: .canningvale,
             courtNumber: 13,
-            startTime: "12:00 PM",
-            endTime: "01:30 PM",
+            startTime: Date(),
+            endTime: Calendar.current.date(byAdding: .hour, value: 1, to: Date())!,
             dayOfWeek: .monday
         )
         context.insert(trainingSession)

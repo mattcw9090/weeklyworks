@@ -22,8 +22,8 @@ class TrainingSessionViewModel: ObservableObject {
         student: Student,
         courtLocation: CourtLocation,
         courtNumber: Int,
-        startTime: String,
-        endTime: String,
+        startTime: Date,
+        endTime: Date,
         dayOfWeek: DayOfWeek,
         isMessaged: Bool = false,
         isBooked: Bool = false,
@@ -60,8 +60,8 @@ class TrainingSessionViewModel: ObservableObject {
         student: Student,
         courtLocation: CourtLocation,
         courtNumber: Int,
-        startTime: String,
-        endTime: String,
+        startTime: Date,
+        endTime: Date,
         dayOfWeek: DayOfWeek,
         isMessaged: Bool,
         isBooked: Bool,
@@ -102,7 +102,7 @@ class TrainingSessionViewModel: ObservableObject {
         }
         
         let studentName = student.name
-        let timeSlot = "\(session.startTime) - \(session.endTime)"
+        let timeSlot = "\(formattedTime(session.startTime)) - \(formattedTime(session.endTime))"
         let venue = "\(session.courtLocation.rawValue), Court \(session.courtNumber)"
         let day = session.dayOfWeek.rawValue
         
@@ -122,6 +122,12 @@ class TrainingSessionViewModel: ObservableObject {
         case .instagram:
             openInstagram(username: student.contact)
         }
+    }
+    
+    private func formattedTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: date)
     }
     
     private func sendWhatsAppMessage(to phoneNumber: String, message: String) {

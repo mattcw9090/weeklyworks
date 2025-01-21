@@ -11,8 +11,8 @@ struct AddEditTrainingSessionView: View {
     @State private var selectedStudent: Student?
     @State private var selectedCourtLocation: CourtLocation = .canningvale
     @State private var courtNumber: String = ""
-    @State private var startTime: String = ""
-    @State private var endTime: String = ""
+    @State private var startTime: Date = Date()
+    @State private var endTime: Date = Date()
     @State private var selectedDayOfWeek: DayOfWeek = .monday
     @State private var isMessaged: Bool = false
     @State private var isBooked: Bool = false
@@ -39,8 +39,8 @@ struct AddEditTrainingSessionView: View {
                         .keyboardType(.numberPad)
                 }
                 Section("Time") {
-                    TextField("Start Time (e.g. 14:00)", text: $startTime)
-                    TextField("End Time (e.g. 15:30)", text: $endTime)
+                    DatePicker("Start Time", selection: $startTime, displayedComponents: .hourAndMinute)
+                    DatePicker("End Time", selection: $endTime, displayedComponents: .hourAndMinute)
                 }
                 Section("Day of the Week") {
                     Picker("Select Day", selection: $selectedDayOfWeek) {
