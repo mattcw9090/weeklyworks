@@ -25,6 +25,13 @@ struct TrainingSessionsView: View {
                                 Label("Message", systemImage: "envelope")
                             }
                             .tint(.blue)
+                            
+                            Button {
+                                trainingSessionViewModel.addToCalendar(for: session)
+                            } label: {
+                                Label("Add to Google Calendar", systemImage: "calendar")
+                            }
+                            .tint(.green)
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {

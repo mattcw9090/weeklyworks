@@ -18,7 +18,6 @@ class TrainingSessionViewModel: ObservableObject {
                     return lhs.dayOfWeek.order < rhs.dayOfWeek.order
                 }
             }
-            
         } catch {
             print("Error fetching training sessions: \(error)")
         }
@@ -171,6 +170,60 @@ class TrainingSessionViewModel: ObservableObject {
                 UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
             } else {
                 print("Error: Unable to construct fallback Instagram URL.")
+            }
+        }
+    }
+    
+    func addToCalendar(for session: TrainingSession) {
+        guard let student = session.student else {
+            print("Error: Training session has no associated student.")
+            return
+        }
+        
+        // Create the .ics content
+        let eventString = """
+        BEGIN:VCALENDAR
+        VERSION:2.0
+        BEGIN:VEVENT
+        SUMMARY:Training with \(student.name)
+        DTSTART:\(formattedDateForICS(session.startTime))
+        DTEND:\(formattedDateForICS(session.endTime))
+        LOCATION:\(session.courtLocation.rawValue), Court \(session.courtNumber)
+        DESCRIPTION:Training session with \(student.name) on \(session.dayOfWeek.rawValue)
+        END:VEVENT
+        END:VCALENDAR
+        """
+        
+        // Write the .ics file to a temporary location
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("TrainingSession.ics")
+        do {
+            try eventString.write(to: tempURL, atomically: true, encoding: .utf8)
+            
+            // Share the file (UIActivityViewController)
+            shareCalendarFile(at: tempURL)
+        } catch {
+            print("Error writing calendar file: \(error)")
+        }
+    }
+    
+    /// Converts Date to the `yyyyMMdd'T'HHmmss'Z'` format (UTC time) for iCalendar usage.
+    private func formattedDateForICS(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        return formatter.string(from: date)
+    }
+    
+    /// Presents the share sheet so the user can add the `.ics` event to a calendar.
+    private func shareCalendarFile(at url: URL) {
+        DispatchQueue.main.async {
+            let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+            
+            // If you're in a SwiftUI app, we need a UIViewController to present from.
+            // For simplicity, we'll grab the first window's rootViewController.
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let rootVC = windowScene.windows.first?.rootViewController {
+                rootVC.present(activityViewController, animated: true, completion: nil)
             }
         }
     }
