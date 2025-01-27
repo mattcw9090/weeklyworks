@@ -6,7 +6,6 @@ class TrainingSessionViewModel: ObservableObject {
     @Published var trainingSessions: [TrainingSession] = []
     
     // MARK: - Fetch
-    
     func fetchTrainingSessions(from modelContext: ModelContext) {
         let fetchDescriptor = FetchDescriptor<TrainingSession>()
         do {
@@ -28,7 +27,7 @@ class TrainingSessionViewModel: ObservableObject {
     func addTrainingSession(
         student: Student,
         courtLocation: CourtLocation,
-        courtNumber: Int,
+        courtNumber: Int?,   // Now optional
         startTime: Date,
         endTime: Date,
         dayOfWeek: DayOfWeek,
@@ -58,6 +57,7 @@ class TrainingSessionViewModel: ObservableObject {
     }
     
     func updateTrainingSession(_ trainingSession: TrainingSession, in modelContext: ModelContext) {
+        // Just save changes. The object's properties should already be updated.
         saveChanges(in: modelContext)
         fetchTrainingSessions(from: modelContext)
     }
@@ -66,7 +66,7 @@ class TrainingSessionViewModel: ObservableObject {
         existingSession: TrainingSession?,
         student: Student,
         courtLocation: CourtLocation,
-        courtNumber: Int,
+        courtNumber: Int?,  // Now optional
         startTime: Date,
         endTime: Date,
         dayOfWeek: DayOfWeek,
@@ -110,7 +110,16 @@ class TrainingSessionViewModel: ObservableObject {
         
         let studentName = student.name
         let timeSlot = "\(formattedTime(session.startTime)) - \(formattedTime(session.endTime))"
-        let venue = "\(session.courtLocation.rawValue), Court \(session.courtNumber)"
+        
+        // If courtNumber is nil, omit it from the message/venue
+        let venue: String = {
+            if let number = session.courtNumber {
+                return "\(session.courtLocation.rawValue), Court \(number)"
+            } else {
+                return session.courtLocation.rawValue
+            }
+        }()
+        
         let day = session.dayOfWeek.rawValue
         
         let messageText = """
@@ -180,7 +189,8 @@ class TrainingSessionViewModel: ObservableObject {
             return
         }
         
-        // Create the .ics content
+        // Build the ICS content, omitting 'Court' if it doesn't exist
+        let locationString = session.courtNumber.map { ", Court \($0)" } ?? ""
         let eventString = """
         BEGIN:VCALENDAR
         VERSION:2.0
@@ -188,25 +198,21 @@ class TrainingSessionViewModel: ObservableObject {
         SUMMARY:Training with \(student.name)
         DTSTART:\(formattedDateForICS(session.startTime))
         DTEND:\(formattedDateForICS(session.endTime))
-        LOCATION:\(session.courtLocation.rawValue), Court \(session.courtNumber)
+        LOCATION:\(session.courtLocation.rawValue)\(locationString)
         DESCRIPTION:Training session with \(student.name) on \(session.dayOfWeek.rawValue)
         END:VEVENT
         END:VCALENDAR
         """
         
-        // Write the .ics file to a temporary location
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("TrainingSession.ics")
         do {
             try eventString.write(to: tempURL, atomically: true, encoding: .utf8)
-            
-            // Share the file (UIActivityViewController)
             shareCalendarFile(at: tempURL)
         } catch {
             print("Error writing calendar file: \(error)")
         }
     }
     
-    /// Converts Date to the `yyyyMMdd'T'HHmmss'Z'` format (UTC time) for iCalendar usage.
     private func formattedDateForICS(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
@@ -214,13 +220,9 @@ class TrainingSessionViewModel: ObservableObject {
         return formatter.string(from: date)
     }
     
-    /// Presents the share sheet so the user can add the `.ics` event to a calendar.
     private func shareCalendarFile(at url: URL) {
         DispatchQueue.main.async {
             let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-            
-            // If you're in a SwiftUI app, we need a UIViewController to present from.
-            // For simplicity, we'll grab the first window's rootViewController.
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let rootVC = windowScene.windows.first?.rootViewController {
                 rootVC.present(activityViewController, animated: true, completion: nil)
@@ -229,7 +231,6 @@ class TrainingSessionViewModel: ObservableObject {
     }
     
     // MARK: - Persistence
-    
     private func saveChanges(in modelContext: ModelContext) {
         do {
             try modelContext.save()

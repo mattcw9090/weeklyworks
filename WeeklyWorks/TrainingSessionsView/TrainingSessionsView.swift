@@ -83,11 +83,16 @@ struct TrainingRowView: View {
         VStack(alignment: .leading) {
             Text(session.student?.name ?? "Unknown Student")
                 .font(.headline)
-            Text("\(session.courtLocation.rawValue), Court \(session.courtNumber)")
+
+            // Show "Court X" only if courtNumber is not nil
+            let courtNumberText = session.courtNumber.map { ", Court \($0)" } ?? ""
+            Text("\(session.courtLocation.rawValue)\(courtNumberText)")
                 .font(.subheadline)
+            
             Text("\(session.dayOfWeek.rawValue): \(formattedTime(session.startTime)) - \(formattedTime(session.endTime))")
                 .font(.caption)
                 .foregroundColor(.gray)
+
             HStack {
                 Text("Messaged: ")
                     .font(.caption)
@@ -111,6 +116,7 @@ struct TrainingRowView: View {
         return formatter.string(from: date)
     }
 }
+
 
 #Preview {
     let schema = Schema([Student.self, TrainingSession.self])

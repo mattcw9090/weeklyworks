@@ -25,7 +25,11 @@ struct AddEditTrainingSessionView: View {
         let startTime = calendar.date(bySettingHour: 8, minute: 0, second: 0, of: startOfDay)!
         let endTime = calendar.date(bySettingHour: 23, minute: 0, second: 0, of: startOfDay)!
         
-        return stride(from: startTime.timeIntervalSinceReferenceDate, to: endTime.timeIntervalSinceReferenceDate, by: 30 * 60).map {
+        return stride(
+            from: startTime.timeIntervalSinceReferenceDate,
+            to: endTime.timeIntervalSinceReferenceDate,
+            by: 30 * 60
+        ).map {
             Date(timeIntervalSinceReferenceDate: $0)
         }
     }
@@ -85,11 +89,12 @@ struct AddEditTrainingSessionView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        guard let selectedStudent = selectedStudent,
-                              let courtNumberInt = Int(courtNumber) else {
+                    Button("Save") {
+                        guard let selectedStudent = selectedStudent else {
                             return
                         }
+
+                        let courtNumberInt = Int(courtNumber)
 
                         scheduleViewModel.saveOrUpdateSession(
                             existingSession: existingSession,
@@ -105,8 +110,6 @@ struct AddEditTrainingSessionView: View {
                         )
 
                         onDismiss?()
-                    }) {
-                        Text("Save")
                     }
                 }
             }
@@ -114,7 +117,7 @@ struct AddEditTrainingSessionView: View {
                 if let session = existingSession {
                     selectedStudent = session.student
                     selectedCourtLocation = session.courtLocation
-                    courtNumber = String(session.courtNumber)
+                    courtNumber = session.courtNumber.map(String.init) ?? ""
                     startTime = session.startTime
                     endTime = session.endTime
                     selectedDayOfWeek = session.dayOfWeek

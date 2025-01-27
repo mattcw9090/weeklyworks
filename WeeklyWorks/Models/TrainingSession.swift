@@ -35,7 +35,7 @@ class TrainingSession {
     @Attribute(.unique) var id: UUID
     var student: Student?
     var courtLocationRaw: String
-    var courtNumber: Int
+    var courtNumber: Int?
     var startTimeRaw: Date
     var endTimeRaw: Date
     var dayOfWeekRaw: String
@@ -78,7 +78,7 @@ class TrainingSession {
         }
     }
 
-    init(student: Student?, courtLocation: CourtLocation, courtNumber: Int, startTime: Date, endTime: Date,
+    init(student: Student?, courtLocation: CourtLocation, courtNumber: Int? = nil, startTime: Date, endTime: Date,
          dayOfWeek: DayOfWeek, isMessaged: Bool = false, isBooked: Bool = false) {
         self.id = UUID()
         self.student = student
