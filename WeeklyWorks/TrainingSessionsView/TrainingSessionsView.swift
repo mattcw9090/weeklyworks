@@ -12,34 +12,45 @@ struct TrainingSessionsView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(trainingSessionViewModel.trainingSessions) { session in
-                    TrainingRowView(session: session)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            sessionToEdit = session
-                        }
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button {
-                                trainingSessionViewModel.messageStudent(for: session)
-                            } label: {
-                                Label("Message", systemImage: "envelope")
+                // Iterate through each day of the week
+                ForEach(DayOfWeek.allCases, id: \.self) { day in
+                    let sessionsForDay = trainingSessionViewModel.trainingSessions
+                        .filter { $0.dayOfWeek == day }
+                    
+                    // Only show the section if there are sessions for that day
+                    if !sessionsForDay.isEmpty {
+                        Section(header: Text(day.rawValue).bold()) {
+                            ForEach(sessionsForDay) { session in
+                                TrainingRowView(session: session)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        sessionToEdit = session
+                                    }
+                                    .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                        Button {
+                                            trainingSessionViewModel.messageStudent(for: session)
+                                        } label: {
+                                            Label("Message", systemImage: "envelope")
+                                        }
+                                        .tint(.blue)
+                                        
+                                        Button {
+                                            trainingSessionViewModel.addToCalendar(for: session)
+                                        } label: {
+                                            Label("Add to Google Calendar", systemImage: "calendar")
+                                        }
+                                        .tint(.green)
+                                    }
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button(role: .destructive) {
+                                            trainingSessionViewModel.deleteTrainingSession(session, from: modelContext)
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
                             }
-                            .tint(.blue)
-                            
-                            Button {
-                                trainingSessionViewModel.addToCalendar(for: session)
-                            } label: {
-                                Label("Add to Google Calendar", systemImage: "calendar")
-                            }
-                            .tint(.green)
                         }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                trainingSessionViewModel.deleteTrainingSession(session, from: modelContext)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
+                    }
                 }
             }
             .navigationTitle("Student Trainings")
@@ -54,6 +65,7 @@ struct TrainingSessionsView: View {
                 trainingSessionViewModel.fetchTrainingSessions(from: modelContext)
                 studentViewModel.fetchStudents(from: modelContext)
             }
+            // Editing Sheet
             .sheet(item: $sessionToEdit) { session in
                 AddEditTrainingSessionView(
                     scheduleViewModel: trainingSessionViewModel,
@@ -63,6 +75,7 @@ struct TrainingSessionsView: View {
                     sessionToEdit = nil
                 }
             }
+            // Add New Sheet
             .sheet(isPresented: $showAddSheet) {
                 AddEditTrainingSessionView(
                     scheduleViewModel: trainingSessionViewModel,
