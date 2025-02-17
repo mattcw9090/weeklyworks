@@ -183,36 +183,71 @@ class TrainingSessionViewModel: ObservableObject {
         }
     }
     
-    func addToCalendar(for session: TrainingSession) {
-        guard let student = session.student else {
-            print("Error: Training session has no associated student.")
-            return
+    // MARK: - Calendar Export
+    
+    /// Exports all training sessions into one ICS file.
+    func exportAllTrainingSessionsToCalendar() {
+        var icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\n"
+        
+        for session in trainingSessions {
+            guard let student = session.student else { continue }
+            
+            // Calculate the next occurrence date for the session's day.
+            guard let nextOccurrence = dateForNextOccurrence(of: session.dayOfWeek) else { continue }
+            
+            // Combine that date with the stored start and end times.
+            guard let eventStart = combine(date: nextOccurrence, with: session.startTime),
+                  let eventEnd = combine(date: nextOccurrence, with: session.endTime) else { continue }
+            
+            let startDateStr = formattedDateForICS(eventStart)
+            let endDateStr = formattedDateForICS(eventEnd)
+            
+            // Omit the court number if it's nil.
+            let locationString = session.courtNumber.map { ", Court \($0)" } ?? ""
+            
+            let eventString = """
+            BEGIN:VEVENT
+            SUMMARY:Training with \(student.name)
+            DTSTART:\(startDateStr)
+            DTEND:\(endDateStr)
+            LOCATION:\(session.courtLocation.rawValue)\(locationString)
+            DESCRIPTION:Training session with \(student.name) on \(session.dayOfWeek.rawValue)
+            END:VEVENT
+            """
+            icsContent.append(eventString + "\n")
         }
         
-        // Build the ICS content, omitting 'Court' if it doesn't exist
-        let locationString = session.courtNumber.map { ", Court \($0)" } ?? ""
-        let eventString = """
-        BEGIN:VCALENDAR
-        VERSION:2.0
-        BEGIN:VEVENT
-        SUMMARY:Training with \(student.name)
-        DTSTART:\(formattedDateForICS(session.startTime))
-        DTEND:\(formattedDateForICS(session.endTime))
-        LOCATION:\(session.courtLocation.rawValue)\(locationString)
-        DESCRIPTION:Training session with \(student.name) on \(session.dayOfWeek.rawValue)
-        END:VEVENT
-        END:VCALENDAR
-        """
+        icsContent.append("END:VCALENDAR")
         
-        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("TrainingSession.ics")
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("AllTrainingSessions.ics")
         do {
-            try eventString.write(to: tempURL, atomically: true, encoding: .utf8)
+            try icsContent.write(to: tempURL, atomically: true, encoding: .utf8)
             shareCalendarFile(at: tempURL)
         } catch {
             print("Error writing calendar file: \(error)")
         }
     }
     
+    /// Calculate the next occurrence of a given day of the week.
+    private func dateForNextOccurrence(of dayOfWeek: DayOfWeek, startingFrom baseDate: Date = Date()) -> Date? {
+        let calendar = Calendar.current
+        // Assumes dayOfWeek.order corresponds to the weekday number (e.g., 1 = Sunday, 2 = Monday, etc.)
+        let weekdayNumber = dayOfWeek.order
+        return calendar.nextDate(after: baseDate, matching: DateComponents(weekday: weekdayNumber), matchingPolicy: .nextTime)
+    }
+    
+    /// Combine a date (year/month/day) with the time components from another date.
+    private func combine(date: Date, with time: Date) -> Date? {
+        let calendar = Calendar.current
+        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: time)
+        var dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+        dateComponents.hour = timeComponents.hour
+        dateComponents.minute = timeComponents.minute
+        dateComponents.second = timeComponents.second
+        return calendar.date(from: dateComponents)
+    }
+    
+    /// Formats a date for ICS (UTC).
     private func formattedDateForICS(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
