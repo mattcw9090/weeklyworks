@@ -16,6 +16,7 @@ struct TrainingSessionsView: View {
                 ForEach(DayOfWeek.allCases, id: \.self) { day in
                     let sessionsForDay = trainingSessionViewModel.trainingSessions
                         .filter { $0.dayOfWeek == day }
+                        .sorted { $0.startTime < $1.startTime }
                     
                     // Only show the section if there are sessions for that day
                     if !sessionsForDay.isEmpty {
