@@ -54,6 +54,9 @@ struct TrainingSessionsView: View {
                         Button("Export Calendar") {
                             trainingSessionViewModel.exportAllTrainingSessionsToCalendar()
                         }
+                        Button("Reset Week") {
+                            trainingSessionViewModel.resetWeek(in: modelContext)
+                        }
                         Button("Add") {
                             showAddSheet = true
                         }

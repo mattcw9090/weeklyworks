@@ -265,6 +265,19 @@ class TrainingSessionViewModel: ObservableObject {
         }
     }
     
+    /// Resets the statuses for all training sessions for the week.
+    func resetWeek(in modelContext: ModelContext) {
+        // Reset the isMessaged and isBooked flags for each training session.
+        trainingSessions.forEach { session in
+            session.isMessaged = false
+            session.isBooked = false
+        }
+        
+        // Save changes and refresh the list.
+        saveChanges(in: modelContext)
+        fetchTrainingSessions(from: modelContext)
+    }
+    
     // MARK: - Persistence
     private func saveChanges(in modelContext: ModelContext) {
         do {
