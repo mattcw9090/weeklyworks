@@ -12,7 +12,16 @@ class TrainingSessionViewModel: ObservableObject {
             trainingSessions = try modelContext.fetch(fetchDescriptor)
             trainingSessions.sort { lhs, rhs in
                 if lhs.dayOfWeek.order == rhs.dayOfWeek.order {
-                    return lhs.startTime < rhs.startTime
+                    let lhsHour = Calendar.current.component(.hour, from: lhs.startTime)
+                    let lhsMinute = Calendar.current.component(.minute, from: lhs.startTime)
+                    let rhsHour = Calendar.current.component(.hour, from: rhs.startTime)
+                    let rhsMinute = Calendar.current.component(.minute, from: rhs.startTime)
+                    
+                    if lhsHour == rhsHour {
+                        return lhsMinute < rhsMinute
+                    } else {
+                        return lhsHour < rhsHour
+                    }
                 } else {
                     return lhs.dayOfWeek.order < rhs.dayOfWeek.order
                 }
